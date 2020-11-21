@@ -72,15 +72,15 @@ def file_to_df(save_file):
         # deal with rest of the lines - data rows
         rest_lines = f.readlines()   
         row_num = 0
-        for l in rest_lines:
+        result_dict = {}
+        for l in rest_lines:            
             if (l.startswith("|")) and (l != col_names_line):
-                try:
-                    result_df.loc[row_num] = process_line_delimiter(l)
-                except ValueError:
-                    print(l)
+                result_dict[row_num] = process_line_delimiter(l)
             row_num += 1
-            if row_num % 100 == 0:
-                print(row_num, "lines loaded")
+            if row_num % 10000 == 0:
+                print("{} lines loaded".format(row_num))
+        result_df = pd.DataFrame.from_dict(result_dict,orient='index')
+
         print('file loaded')      
     return result_df
     
