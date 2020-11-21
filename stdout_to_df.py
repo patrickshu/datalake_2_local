@@ -67,8 +67,6 @@ def file_to_df(save_file):
         col_names_line = f.readline()
         col_list = process_line(length_list, col_names_line)
         
-        result_df = pd.DataFrame(columns=col_list)
-        
         # deal with rest of the lines - data rows
         rest_lines = f.readlines()   
         row_num = 0
@@ -79,8 +77,9 @@ def file_to_df(save_file):
             row_num += 1
             if row_num % 10000 == 0:
                 print("{} lines loaded".format(row_num))
-        result_df = pd.DataFrame.from_dict(result_dict,orient='index')
-
+        result_df = pd.DataFrame.from_dict(result_dict,
+                                           orient='index',
+                                           columns=col_list)
         print('file loaded')      
     return result_df
     
