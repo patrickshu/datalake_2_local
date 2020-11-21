@@ -80,7 +80,7 @@ def file_to_df(save_file):
                     print(l)
             row_num += 1
             if row_num % 100 == 0:
-                print(row_num)
+                print(row_num, "lines loaded")
         print('file loaded')      
     return result_df
     
