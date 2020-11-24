@@ -117,8 +117,8 @@ def hive_2_df(command,
                bdp_pw,
                edge_node='172.22.10.4', 
                azure_jump='172.20.1.158',
-               az='az_a_ShuYingmu',
-               bdp='bdp_admin_s',
+               az='',
+               bdp='',
                save_file='lake_output'
                ):
     '''
@@ -160,8 +160,8 @@ class Hive_console:
                  bdp_pw,
                  edge_node='172.22.10.4', 
                  azure_jump='172.20.1.158',
-                 az='az_a_ShuYingmu',
-                 bdp='bdp_admin_s'):
+                 az='',
+                 bdp=''):
         '''      
         az_pw: azure password
         bdp_pw: bdp_xxxx_s password
