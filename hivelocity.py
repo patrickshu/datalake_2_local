@@ -12,7 +12,6 @@ import os
 import re
 import sys
 import pandas as pd
-#from stdout_to_df import file_to_df
 
 # sample Beeline command to run a Hive query.
 # In line with beeline syntax, need to add "" surrounding the sql query
@@ -136,11 +135,17 @@ def hive_2_df(command,
     save_file: file name to store the raw console text output
     '''
     
-    hive = Hive_console(az_pw=az_pw, bdp_pw=bdp_pw)
+    hive = Hive_console(az_pw=az_pw, 
+                        bdp_pw=bdp_pw,
+                        edge_node=edge_node, 
+                        azure_jump=azure_jump,
+                        az=az,
+                        bdp=bdp
+                        )
     stdin, stdout, stderr = hive.jhost.exec_command(command)
-    
-    out_msg = stdout.read().decode("utf-8")
-    result_df = string_2_df(out_msg, save_file)
+    print('saving to string...')
+    #out_msg = stdout.read().decode("utf-8")
+    result_df = string_2_df(stdout.read().decode("utf-8"), save_file)
 
     hive.close()
     print('connection closed\n')
