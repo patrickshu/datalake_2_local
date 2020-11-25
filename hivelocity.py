@@ -19,31 +19,6 @@ import pandas as pd
 
 # TO-DO 
 # exception handling
-# ##################
-
-def process_line(length_list, line):
-    '''
-    processing header(column names) and data rows
-    length_list: Python list, number of charactors per column stored as integer in
-    a list
-    line: string, line to be processed
-    '''
-    col_list = []
-    start_pos = 1
-    for l in length_list:
-        col_list.append(line[start_pos:start_pos+l].strip())
-        start_pos+=(l+1)
-        
-    return col_list
-
-
-def process_line_delimiter(line, delimiter='|'):
-    '''
-    processing data rows based on delimiter
-    line: string, line to be processed
-    '''      
-    return [x.strip() for x in line.split('|')][1:-1]
-
 
 def file_2_df(save_file):
     
@@ -53,6 +28,30 @@ def file_2_df(save_file):
     console will print out the progress.
     '''
     
+    def process_line(length_list, line):
+        '''
+        processing header(column names) and data rows
+        length_list: Python list, number of charactors per column stored as integer in
+        a list
+        line: string, line to be processed
+        '''
+        col_list = []
+        start_pos = 1
+        for l in length_list:
+            col_list.append(line[start_pos:start_pos+l].strip())
+            start_pos+=(l+1)
+            
+        return col_list
+
+
+    def process_line_delimiter(line, delimiter='|'):
+        '''
+        processing data rows based on delimiter
+        line: string, line to be processed
+        '''      
+        return [x.strip() for x in line.split('|')][1:-1]
+    
+
     with open(save_file, 'r') as f:
         
         regex = re.compile(r'''[a-zA-Z0-9]+''')
@@ -144,7 +143,6 @@ def hive_2_df(command,
                         )
     stdin, stdout, stderr = hive.jhost.exec_command(command)
     print('saving to string...')
-    #out_msg = stdout.read().decode("utf-8")
     result_df = string_2_df(stdout.read().decode("utf-8"), save_file)
 
     hive.close()
@@ -182,9 +180,14 @@ class Hive_console:
         self.azure_jump = azure_jump
         self.az = az
         self.bdp = bdp
+        self.status = 'Disconnected'
         # Start Datalake connection in initiation.
         self._start()
-        
+    
+    
+    def __repr__(self):
+        return 'Hive_console({}, {}, {})'.format(self.az, self.bdp, self.status)
+    
            
     def _start(self):
         '''
@@ -209,8 +212,25 @@ class Hive_console:
                       username=self.bdp, 
                       password=self.bdp_pw, 
                       sock=vmchannel)
+        self.status = 'Connected'
+    
+    
+    def _auto_reconnect(f):
+        '''
+        Automatically reconnect to Hive if disconnected.
+        
+        '''
+        def wrapper(*args, **kwargs):
+            try:
+                f(*args, **kwargs)
+            except AttributeError:
+                print('Disconnected from Hive, auto reconnecting')
+                args[0]._start()
+                f(*args, **kwargs)
+        return wrapper
 
     
+    @_auto_reconnect
     def execute(self, command, verbose=False, to_df=False):
         '''
         From SQL running on hive, to Pandas DataFrame.
@@ -246,6 +266,6 @@ class Hive_console:
         '''
         self.jhost.close()
         self.vm.close()
-    
+        self.status = 'Disonnected'
     
     
