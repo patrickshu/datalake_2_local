@@ -28,22 +28,6 @@ def file_2_df(save_file):
     console will print out the progress.
     '''
     
-    def process_line(length_list, line):
-        '''
-        processing header(column names) and data rows
-        length_list: Python list, number of charactors per column stored as integer in
-        a list
-        line: string, line to be processed
-        '''
-        col_list = []
-        start_pos = 1
-        for l in length_list:
-            col_list.append(line[start_pos:start_pos+l].strip())
-            start_pos+=(l+1)
-            
-        return col_list
-
-
     def process_line_delimiter(line, delimiter='|'):
         '''
         processing data rows based on delimiter
@@ -62,20 +46,9 @@ def file_2_df(save_file):
         except AssertionError:
             print('unknown file format')
             sys.exit()
-        counter = 0
-        length_list = []
-        for x in header_length:
-            if x == '+' and counter == 0:
-                pass
-            elif x == '-':
-                counter += 1
-            elif x == '+':
-                length_list.append(counter)
-                counter = 0
         # get the column names from second line, based on length_list
         col_names_line = f.readline()
-        col_list = process_line(length_list, col_names_line)
-        
+        col_list = process_line_delimiter(col_names_line)
         # deal with rest of the lines - data rows
         rest_lines = f.readlines()   
         row_num = 0
