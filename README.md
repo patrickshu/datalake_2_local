@@ -1,1 +1,3 @@
-# datalake_2_local
+# Hivelocity
+
+Hive query results directly from local laptop
